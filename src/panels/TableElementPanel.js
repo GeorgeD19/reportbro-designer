@@ -124,11 +124,18 @@ export default class TableElementPanel {
         elDiv = $('<div class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_table_element_content_rows">${this.rb.getLabel('tableElementContentRows')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
-        let elContentRows = $(`<input id="rbro_table_element_content_rows" maxlength="1">`)
+        // let elContentRows = $(`<input id="rbro_table_element_content_rows" maxlength="1">`)
+        let elContentRows = $(`<input id="rbro_table_element_content_rows">`) // Unlimited rows
             .change(event => {
                 let obj = this.rb.getDataObject(this.selectedObjId);
                 if (obj !== null) {
-                    let val = utils.checkInputDecimal(elContentRows.val(), 1, 9);
+                    // let val = utils.checkInputDecimal(elContentRows.val(), 1, 9); // Unlimited rows
+                    let val = elContentRows.val();
+                    console.log('val', val);
+                    if (val < 1) {
+                        val = 1;
+                    }
+                    console.log('val', val);
                     if (val !== elContentRows.val()) {
                         elContentRows.val(val);
                     }

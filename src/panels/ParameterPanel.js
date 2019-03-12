@@ -89,6 +89,7 @@ export default class ParameterPanel {
                 <option value="number">${this.rb.getLabel('parameterTypeNumber')}</option>
                 <option value="boolean">${this.rb.getLabel('parameterTypeBoolean')}</option>
                 <option value="date">${this.rb.getLabel('parameterTypeDate')}</option>
+                <option value="image">${this.rb.getLabel('parameterTypeImage')}</option>
             </select>`)
             .change(event => {
                 if (this.rb.getDataObject(this.selectedObjId) !== null) {
@@ -402,11 +403,11 @@ export default class ParameterPanel {
         }
         // do not allow image and sum/average parameter in list
         if (parentParameter !== null && parentParameter.getValue('type') === Parameter.type.array) {
-            $('#rbro_parameter_type option[value="image"]').addClass('rbroHidden');
+            // $('#rbro_parameter_type option[value="image"]').addClass('rbroHidden');
             $('#rbro_parameter_type option[value="sum"]').addClass('rbroHidden');
             $('#rbro_parameter_type option[value="average"]').addClass('rbroHidden');
         } else {
-            $('#rbro_parameter_type option[value="image"]').removeClass('rbroHidden');
+            // $('#rbro_parameter_type option[value="image"]').removeClass('rbroHidden');
             $('#rbro_parameter_type option[value="sum"]').removeClass('rbroHidden');
             $('#rbro_parameter_type option[value="average"]').removeClass('rbroHidden');
         }
