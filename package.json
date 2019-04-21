@@ -24,7 +24,11 @@
   },
   "files": [
     "dist/*.js",
-    "dist/*.css"
+    "dist/*.css",
+    "dist/*.gif",
+    "dist/*.png",
+    "dist/*.map",
+    "dist/iconfonts"
   ],
   "main": "dist/reportbro.js",
   "scripts": {
