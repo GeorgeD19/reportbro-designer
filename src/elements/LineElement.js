@@ -30,7 +30,7 @@ export default class LineElement extends DocElement {
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'containerId', 'x', 'y', 'width', 'height', 'color', 'printIf'];
+        return ['id', 'containerId', 'x', 'y', 'width', 'height', 'zIndex', 'color', 'printIf'];
     }
 
     getElementType() {

@@ -122,7 +122,7 @@ export default class TextElement extends DocElement {
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'containerId', 'x', 'y', 'width', 'height', 'content', 'eval',
+        return ['id', 'containerId', 'x', 'y', 'width', 'height', 'zIndex', 'content', 'eval',
             'styleId', 'bold', 'italic', 'underline',
             'horizontalAlignment', 'verticalAlignment', 'textColor', 'backgroundColor', 'font', 'fontSize',
             'lineSpacing', 'borderColor', 'borderWidth',

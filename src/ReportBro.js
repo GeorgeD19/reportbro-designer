@@ -1407,7 +1407,8 @@ export default class ReportBro {
                 let pdfPrefix = 'data:application/pdf';
                 if (data.substr(0, 4) === 'key:') {
                     self.reportKey = data.substr(4);
-                    self.getDocument().openPdfPreviewTab(self.properties.reportServerUrl + '?key=' + self.reportKey + '&outputFormat=pdf');
+                    var append = self.properties.reportServerUrl.indexOf('?') !== -1 ? '&' : '?';
+                    self.getDocument().openPdfPreviewTab(self.properties.reportServerUrl + append + 'key=' + self.reportKey + '&outputFormat=pdf');
                 } else {
                     self.reportKey = null;
                     try {
@@ -1527,10 +1528,9 @@ export default class ReportBro {
         for (let parameterData of report.parameters) {
             this.createParameter(parameterData);
         }
-        for (let docElementData of report.docElements) {
-            this.createDocElement(docElementData);
+        for (const [key, docElementData] of Object.entries(report.docElements)) {
+            this.createDocElement(docElementData, key);
         }
-
         this.browserDragType = '';
         this.browserDragId = '';
 
@@ -1538,6 +1538,45 @@ export default class ReportBro {
         this.lastCommandIndex = -1;
         this.modified = false;
         this.updateMenuButtons();
+        this.updateIndexes();
+    }
+
+    updateIndexes() {
+        var prevIndex = 0;
+        var zIndex = this.headerBand.panelItem.children.length + this.contentBand.panelItem.children.length + this.footerBand.panelItem.children.length;
+        console.log(this.contentBand);
+        for (const [key, MainPanelItem] of Object.entries(this.headerBand.panelItem.children)) {
+            if (MainPanelItem.data instanceof DocElement) {
+                MainPanelItem.data.zIndex = zIndex - parseInt(key);
+                prevIndex = MainPanelItem.data.zIndex;
+                if($(`#rbro_el${MainPanelItem.data.id}`).css('z-index') !== '999999') {
+                    $(`#rbro_el${MainPanelItem.data.id}`).css({'z-index': MainPanelItem.data.zIndex});
+                }
+            }
+        }
+        zIndex = (prevIndex - 1) > 0 ? prevIndex - 1 : zIndex;
+        for (const [key, MainPanelItem] of Object.entries(this.contentBand.panelItem.children)) {
+            if (MainPanelItem.data instanceof DocElement) {
+                MainPanelItem.data.zIndex = zIndex - parseInt(key);
+                prevIndex = MainPanelItem.data.zIndex;
+                if($(`#rbro_el${MainPanelItem.data.id}`).css('z-index') !== '999999') {
+                    $(`#rbro_el${MainPanelItem.data.id}`).css({'z-index': MainPanelItem.data.zIndex});
+                }
+                if($(`#rbro_el_table${MainPanelItem.data.id}`).parent().css('z-index') !== '999999') {
+                    $(`#rbro_el_table${MainPanelItem.data.id}`).parent().css({'z-index': MainPanelItem.data.zIndex});
+                }
+            }
+        }
+        
+        zIndex = (prevIndex - 1) > 0 ? prevIndex - 1 : zIndex;
+        for (const [key, MainPanelItem] of Object.entries(this.footerBand.panelItem.children)) {
+            if (MainPanelItem.data instanceof DocElement) {
+                MainPanelItem.data.zIndex = zIndex - parseInt(key);
+                if($(`#rbro_el${MainPanelItem.data.id}`).css('z-index') !== '999999') {
+                    $(`#rbro_el${MainPanelItem.data.id}`).css({'z-index': MainPanelItem.data.zIndex});
+                }
+            }
+        }
     }
 
     /**
@@ -1571,7 +1610,8 @@ export default class ReportBro {
      */
     downloadSpreadsheet() {
         if (this.reportKey !== null) {
-            window.open(this.properties.reportServerUrl + '?key=' + this.reportKey + '&outputFormat=xlsx', '_blank');
+            var append = self.properties.reportServerUrl.indexOf('?') !== -1 ? '&' : '?';
+            window.open(this.properties.reportServerUrl + append + 'key=' + this.reportKey + '&outputFormat=xlsx', '_blank');
         }
     }
 }

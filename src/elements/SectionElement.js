@@ -153,7 +153,7 @@ export default class SectionElement extends DocElement {
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'containerId', 'y', 'label', 'dataSource', 'header', 'footer', 'printIf'];
+        return ['id', 'containerId', 'y', 'zIndex', 'label', 'dataSource', 'header', 'footer', 'printIf'];
     }
 
     getElementType() {

@@ -32,6 +32,7 @@ export default class DocElement {
         this.yVal = 0;
         this.widthVal = 0;
         this.heightVal = 0;
+        this.zIndex = 0;
 
         this.errors = [];
     }
@@ -558,7 +559,7 @@ export default class DocElement {
                 elSizerContainer.append(elSizer);
             }
             this.el.addClass('rbroSelected');
-            this.el.css('z-index', '10');
+            this.el.css('z-index', '999999');
         }
         this.selected = true;
     }
@@ -567,8 +568,9 @@ export default class DocElement {
         if (this.el !== null) {
             let elSizerContainer = this.getSizerContainerElement();
             elSizerContainer.find('.rbroSizer').remove();
-            this.el.css('z-index', '');
+            this.el.css('z-index', this.zIndex);
             this.el.removeClass('rbroSelected');
+            this.rb.updateIndexes();
         }
         this.selected = false;
     }

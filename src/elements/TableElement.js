@@ -211,7 +211,7 @@ export default class TableElement extends DocElement {
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'containerId', 'x', 'y', 'dataSource', 'columns', 'header', 'contentRows', 'footer',
+        return ['id', 'containerId', 'x', 'y', 'zIndex', 'dataSource', 'columns', 'header', 'contentRows', 'footer',
             'border', 'borderColor', 'borderWidth',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];
     }

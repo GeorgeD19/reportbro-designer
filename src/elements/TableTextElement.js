@@ -71,7 +71,7 @@ export default class TableTextElement extends TextElement {
      * @returns {String[]}
      */
     getFields() {
-        let fields = ['id', 'width', 'height', 'content', 'eval',
+        let fields = ['id', 'width', 'height', 'content', 'zIndex', 'eval',
             'styleId', 'bold', 'italic', 'underline',
             'horizontalAlignment', 'verticalAlignment', 'textColor', 'backgroundColor', 'font', 'fontSize', 'lineSpacing',
             'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom',

@@ -26,7 +26,7 @@ export default class PageBreakElement extends DocElement {
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'containerId', 'y'];
+        return ['id', 'containerId', 'y', 'zIndex'];
     }
 
     getElementType() {

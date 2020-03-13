@@ -136,7 +136,7 @@ export default class FrameElement extends DocElement {
      */
     getFields() {
         return ['id', 'containerId', 'linkedContainerId', 'label',
-            'x', 'y', 'width', 'height', 'backgroundColor',
+            'x', 'y', 'width', 'height', 'zIndex', 'backgroundColor',
             'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'borderWidth',
             'printIf', 'removeEmptyElement', 'shrinkToContentHeight',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];

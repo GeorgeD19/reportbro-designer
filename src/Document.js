@@ -235,6 +235,7 @@ export default class Document {
                         this.rb.getUniqueId(), container.getId(), -1, this.rb);
                     this.rb.executeCommand(cmd);
                 }
+                this.rb.updateIndexes();
                 event.preventDefault();
                 return false;
             }

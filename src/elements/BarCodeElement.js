@@ -46,7 +46,7 @@ export default class BarCodeElement extends DocElement {
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'containerId', 'x', 'y', 'height', 'content', 'format', 'displayValue',
+        return ['id', 'containerId', 'x', 'y', 'height', 'zIndex', 'content', 'format', 'displayValue',
             'printIf', 'removeEmptyElement',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_colspan', 'spreadsheet_addEmptyRow'];
     }

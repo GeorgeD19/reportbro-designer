@@ -291,6 +291,7 @@ class DocElement {
         this.yVal = 0;
         this.widthVal = 0;
         this.heightVal = 0;
+        this.zIndex = 0;
 
         this.errors = [];
     }
@@ -817,7 +818,7 @@ class DocElement {
                 elSizerContainer.append(elSizer);
             }
             this.el.addClass('rbroSelected');
-            this.el.css('z-index', '10');
+            this.el.css('z-index', '999999');
         }
         this.selected = true;
     }
@@ -826,8 +827,9 @@ class DocElement {
         if (this.el !== null) {
             let elSizerContainer = this.getSizerContainerElement();
             elSizerContainer.find('.rbroSizer').remove();
-            this.el.css('z-index', '');
+            this.el.css('z-index', this.zIndex);
             this.el.removeClass('rbroSelected');
+            this.rb.updateIndexes();
         }
         this.selected = false;
     }
@@ -3044,6 +3046,7 @@ class Document {
                         this.rb.getUniqueId(), container.getId(), -1, this.rb);
                     this.rb.executeCommand(cmd);
                 }
+                this.rb.updateIndexes();
                 event.preventDefault();
                 return false;
             }
@@ -4863,7 +4866,7 @@ class TableElement extends __WEBPACK_IMPORTED_MODULE_0__DocElement__["a" /* defa
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'containerId', 'x', 'y', 'dataSource', 'columns', 'header', 'contentRows', 'footer',
+        return ['id', 'containerId', 'x', 'y', 'zIndex', 'dataSource', 'columns', 'header', 'contentRows', 'footer',
             'border', 'borderColor', 'borderWidth',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];
     }
@@ -5289,7 +5292,7 @@ class TableTextElement extends __WEBPACK_IMPORTED_MODULE_1__TextElement__["a" /*
      * @returns {String[]}
      */
     getFields() {
-        let fields = ['id', 'width', 'height', 'content', 'eval',
+        let fields = ['id', 'width', 'height', 'content', 'zIndex', 'eval',
             'styleId', 'bold', 'italic', 'underline',
             'horizontalAlignment', 'verticalAlignment', 'textColor', 'backgroundColor', 'font', 'fontSize', 'lineSpacing',
             'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom',
@@ -5563,7 +5566,7 @@ class TextElement extends __WEBPACK_IMPORTED_MODULE_0__DocElement__["a" /* defau
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'containerId', 'x', 'y', 'width', 'height', 'content', 'eval',
+        return ['id', 'containerId', 'x', 'y', 'width', 'height', 'zIndex', 'content', 'eval',
             'styleId', 'bold', 'italic', 'underline',
             'horizontalAlignment', 'verticalAlignment', 'textColor', 'backgroundColor', 'font', 'fontSize',
             'lineSpacing', 'borderColor', 'borderWidth',
@@ -6113,7 +6116,7 @@ class FrameElement extends __WEBPACK_IMPORTED_MODULE_0__DocElement__["a" /* defa
      */
     getFields() {
         return ['id', 'containerId', 'linkedContainerId', 'label',
-            'x', 'y', 'width', 'height', 'backgroundColor',
+            'x', 'y', 'width', 'height', 'zIndex', 'backgroundColor',
             'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'borderWidth',
             'printIf', 'removeEmptyElement', 'shrinkToContentHeight',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];
@@ -6217,7 +6220,7 @@ class PageBreakElement extends __WEBPACK_IMPORTED_MODULE_0__DocElement__["a" /* 
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'containerId', 'y'];
+        return ['id', 'containerId', 'y', 'zIndex'];
     }
 
     getElementType() {
@@ -6419,7 +6422,7 @@ class SectionElement extends __WEBPACK_IMPORTED_MODULE_0__DocElement__["a" /* de
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'containerId', 'y', 'label', 'dataSource', 'header', 'footer', 'printIf'];
+        return ['id', 'containerId', 'y', 'zIndex', 'label', 'dataSource', 'header', 'footer', 'printIf'];
     }
 
     getElementType() {
@@ -6674,7 +6677,7 @@ class TableBandElement extends __WEBPACK_IMPORTED_MODULE_0__DocElement__["a" /* 
      * @returns {String[]}
      */
     getFields() {
-        let fields = ['id', 'height', 'backgroundColor'];
+        let fields = ['id', 'height', 'zIndex', 'backgroundColor'];
         if (this.bandType === __WEBPACK_IMPORTED_MODULE_2__container_Band__["a" /* default */].bandType.header) {
             fields.push('repeatHeader');
         } else if (this.bandType === __WEBPACK_IMPORTED_MODULE_2__container_Band__["a" /* default */].bandType.content) {
@@ -8369,7 +8372,8 @@ class ReportBro {
                 let pdfPrefix = 'data:application/pdf';
                 if (data.substr(0, 4) === 'key:') {
                     self.reportKey = data.substr(4);
-                    self.getDocument().openPdfPreviewTab(self.properties.reportServerUrl + '?key=' + self.reportKey + '&outputFormat=pdf');
+                    var append = self.properties.reportServerUrl.indexOf('?') !== -1 ? '&' : '?';
+                    self.getDocument().openPdfPreviewTab(self.properties.reportServerUrl + append + 'key=' + self.reportKey + '&outputFormat=pdf');
                 } else {
                     self.reportKey = null;
                     try {
@@ -8489,10 +8493,9 @@ class ReportBro {
         for (let parameterData of report.parameters) {
             this.createParameter(parameterData);
         }
-        for (let docElementData of report.docElements) {
-            this.createDocElement(docElementData);
+        for (const [key, docElementData] of Object.entries(report.docElements)) {
+            this.createDocElement(docElementData, key);
         }
-
         this.browserDragType = '';
         this.browserDragId = '';
 
@@ -8500,6 +8503,45 @@ class ReportBro {
         this.lastCommandIndex = -1;
         this.modified = false;
         this.updateMenuButtons();
+        this.updateIndexes();
+    }
+
+    updateIndexes() {
+        var prevIndex = 0;
+        var zIndex = this.headerBand.panelItem.children.length + this.contentBand.panelItem.children.length + this.footerBand.panelItem.children.length;
+        console.log(this.contentBand);
+        for (const [key, MainPanelItem] of Object.entries(this.headerBand.panelItem.children)) {
+            if (MainPanelItem.data instanceof __WEBPACK_IMPORTED_MODULE_13__elements_DocElement__["a" /* default */]) {
+                MainPanelItem.data.zIndex = zIndex - parseInt(key);
+                prevIndex = MainPanelItem.data.zIndex;
+                if($(`#rbro_el${MainPanelItem.data.id}`).css('z-index') !== '999999') {
+                    $(`#rbro_el${MainPanelItem.data.id}`).css({'z-index': MainPanelItem.data.zIndex});
+                }
+            }
+        }
+        zIndex = (prevIndex - 1) > 0 ? prevIndex - 1 : zIndex;
+        for (const [key, MainPanelItem] of Object.entries(this.contentBand.panelItem.children)) {
+            if (MainPanelItem.data instanceof __WEBPACK_IMPORTED_MODULE_13__elements_DocElement__["a" /* default */]) {
+                MainPanelItem.data.zIndex = zIndex - parseInt(key);
+                prevIndex = MainPanelItem.data.zIndex;
+                if($(`#rbro_el${MainPanelItem.data.id}`).css('z-index') !== '999999') {
+                    $(`#rbro_el${MainPanelItem.data.id}`).css({'z-index': MainPanelItem.data.zIndex});
+                }
+                if($(`#rbro_el_table${MainPanelItem.data.id}`).parent().css('z-index') !== '999999') {
+                    $(`#rbro_el_table${MainPanelItem.data.id}`).parent().css({'z-index': MainPanelItem.data.zIndex});
+                }
+            }
+        }
+        
+        zIndex = (prevIndex - 1) > 0 ? prevIndex - 1 : zIndex;
+        for (const [key, MainPanelItem] of Object.entries(this.footerBand.panelItem.children)) {
+            if (MainPanelItem.data instanceof __WEBPACK_IMPORTED_MODULE_13__elements_DocElement__["a" /* default */]) {
+                MainPanelItem.data.zIndex = zIndex - parseInt(key);
+                if($(`#rbro_el${MainPanelItem.data.id}`).css('z-index') !== '999999') {
+                    $(`#rbro_el${MainPanelItem.data.id}`).css({'z-index': MainPanelItem.data.zIndex});
+                }
+            }
+        }
     }
 
     /**
@@ -8533,7 +8575,8 @@ class ReportBro {
      */
     downloadSpreadsheet() {
         if (this.reportKey !== null) {
-            window.open(this.properties.reportServerUrl + '?key=' + this.reportKey + '&outputFormat=xlsx', '_blank');
+            var append = self.properties.reportServerUrl.indexOf('?') !== -1 ? '&' : '?';
+            window.open(this.properties.reportServerUrl + append + 'key=' + this.reportKey + '&outputFormat=xlsx', '_blank');
         }
     }
 }
@@ -8700,7 +8743,7 @@ class BarCodeElement extends __WEBPACK_IMPORTED_MODULE_0__DocElement__["a" /* de
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'containerId', 'x', 'y', 'height', 'content', 'format', 'displayValue',
+        return ['id', 'containerId', 'x', 'y', 'height', 'zIndex', 'content', 'format', 'displayValue',
             'printIf', 'removeEmptyElement',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_colspan', 'spreadsheet_addEmptyRow'];
     }
@@ -8866,7 +8909,7 @@ class ImageElement extends __WEBPACK_IMPORTED_MODULE_0__DocElement__["a" /* defa
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'containerId', 'x', 'y', 'width', 'height', 'source', 'image', 'imageFilename',
+        return ['id', 'containerId', 'x', 'y', 'width', 'height', 'zIndex', 'source', 'image', 'imageFilename',
             'horizontalAlignment', 'verticalAlignment', 'backgroundColor',
             'printIf', 'removeEmptyElement',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];
@@ -9036,7 +9079,7 @@ class LineElement extends __WEBPACK_IMPORTED_MODULE_0__DocElement__["a" /* defau
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'containerId', 'x', 'y', 'width', 'height', 'color', 'printIf'];
+        return ['id', 'containerId', 'x', 'y', 'width', 'height', 'zIndex', 'color', 'printIf'];
     }
 
     getElementType() {
@@ -9190,7 +9233,7 @@ class SectionBandElement extends __WEBPACK_IMPORTED_MODULE_0__DocElement__["a" /
      * @returns {String[]}
      */
     getFields() {
-        let fields = ['id', 'containerId', 'linkedContainerId', 'height', 'alwaysPrintOnSamePage', 'shrinkToContentHeight'];
+        let fields = ['id', 'containerId', 'linkedContainerId', 'height', 'zIndex', 'alwaysPrintOnSamePage', 'shrinkToContentHeight'];
         if (this.bandType === __WEBPACK_IMPORTED_MODULE_1__container_Band__["a" /* default */].bandType.header) {
             fields.push('repeatHeader');
         }
