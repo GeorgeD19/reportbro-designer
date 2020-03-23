@@ -1544,7 +1544,6 @@ export default class ReportBro {
     updateIndexes() {
         var prevIndex = 0;
         var zIndex = this.headerBand.panelItem.children.length + this.contentBand.panelItem.children.length + this.footerBand.panelItem.children.length;
-        console.log(this.contentBand);
         for (const [key, MainPanelItem] of Object.entries(this.headerBand.panelItem.children)) {
             if (MainPanelItem.data instanceof DocElement) {
                 MainPanelItem.data.zIndex = zIndex - parseInt(key);
